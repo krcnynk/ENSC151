@@ -12,9 +12,11 @@ do
     # SETUP
     cd ${entry}
     rm log.txt
-    cppFile=$(ls -1 | sed -e 's/\..*$//')
+    cppFile=$(ls -1 | egrep '\.cpp$')
+    cppFile=${cppFile::-4}
     cp ../${solPath}makefile.mak ./
     make -f makefile.mak all
+
 
     echo "Group: ${entry}"
     # Test Case 1
@@ -22,6 +24,7 @@ do
     resultsIndex=()
     resultsValues=()
     score=0
+    (ls LATE.txt && ((score-=10)) )
     array=($(timeout 5 sh -c "echo 0 -1 | ./$cppFile"))
     # echo ${array[0]}
     if [[ $? = "124" ]]
@@ -43,7 +46,7 @@ do
 
         if [[ ${resultsValues[0]} == 0 ]]
         then
-            ((score+=1))
+            ((score+=5))
             echo "Test passed.">>log.txt
         else
         echo "Test failed.">>log.txt
@@ -73,7 +76,7 @@ do
 
         if [[ ${resultsValues[0]} == 1 ]]
         then
-            ((score+=1))
+            ((score+=5))
             echo "Test passed.">>log.txt
         else
             echo "Test failed.">>log.txt
@@ -103,7 +106,7 @@ do
 
         if [[ ${resultsValues[0]} == 1 ]]
         then
-            ((score+=1))
+            ((score+=5))
             echo "Test passed.">>log.txt
         else
             echo "Test failed."
@@ -132,7 +135,7 @@ do
         done
         if [[ ${resultsValues[0]} == 0 && ${resultsValues[1]} == 1 && ${resultsValues[2]} == 1 ]]
         then
-            ((score+=2))
+            ((score+=10))
             echo "Test passed.">>log.txt
         else
             echo "Test failed.">>log.txt
@@ -144,7 +147,7 @@ do
     echo "Test Case 5">>log.txt
     resultsIndex=()
     resultsValues=()
-    array=($(timeout 5 sh -c "echo 5 10 15 -1 | ./$cppFile"))
+    array=($(timeout 5 sh -c "echo 5 10 15 20 -1 | ./$cppFile"))
     # echo ${array[@]}
     if [[ $? = "124" ]]
     then
@@ -158,9 +161,9 @@ do
                 resultsValues+=(${array[index]})
             fi
         done
-        if [[ ${resultsValues[0]} == 5 && ${resultsValues[1]} == 55 && ${resultsValues[2]} == 610 ]]
+        if [[ ${resultsValues[0]} == 5 && ${resultsValues[1]} == 55 && ${resultsValues[2]} == 610 && ${resultsValues[2]} == 6765 ]]
         then
-            ((score+=4))
+            ((score+=15))
             echo "Test passed.">>log.txt
         else
             echo "Test failed.">>log.txt
@@ -172,7 +175,7 @@ do
     echo "Test Case 6">>log.txt
     resultsIndex=()
     resultsValues=()
-    array=($(timeout 5 sh -c "echo 150 151 -1 | ./$cppFile"))
+    array=($(timeout 5 sh -c "echo 150 151 152 -1 | ./$cppFile"))
     # echo ${array[@]}
     if [[ $? = "124" ]]
     then
@@ -186,9 +189,9 @@ do
                 resultsValues+=(${array[index]})
             fi
         done
-        if [[ ${resultsValues[0]} == 9969216677189303386214405760200 && ${resultsValues[1]} == 16130531424904581415797907386349 ]]
+        if [[ ${resultsValues[0]} == 9969216677189303386214405760200 && ${resultsValues[1]} == 16130531424904581415797907386349 && ${resultsValues[2]} == 26099748102093884802012313146549 ]]
         then
-            ((score+=4))
+            ((score+=15))
             echo "Test passed.">>log.txt
         else
             echo "Test failed.">>log.txt
@@ -215,18 +218,21 @@ do
                 resultsValues+=(${array[index]})
             fi
         done
-        if [[ ${resultsIndex[-1]} < 15300 && ${resultsIndex[-1]} > 14450 ]]
+        if [[ ${resultsIndex[-1]} < 16000 && ${resultsIndex[-1]} > 11000 ]]
         then
-            ((score+=6))
+            ((score+=20))
             # echo ${resultsIndex[-1]}
             echo "Test passed.">>log.txt
             pass="True"
         else
+            ((score+=20))
             echo "Test failed.">>log.txt
             echo ${resultsIndex[@]}>>log.txt
         fi
     fi
 
+    ((score*=40))
+    ((score/=75))
     echo ${score}
     echo $entry , $score , ${resultsIndex[@]}, $pass >> ../marks.csv
 
