@@ -49,8 +49,10 @@ do
             ((score+=5))
             echo "Test passed.">>log.txt
         else
-        echo "Test failed.">>log.txt
-        echo ${resultsValues[@]}>>log.txt
+            echo "Test failed.">>log.txt
+            printf -v joined '%s,' "${resultsValues[@]}"
+            echo "${joined%,}">>log.txt
+            echo "Expected 0">>log.txt
         fi
         # echo ${resultsValues[@]}
     fi
@@ -80,7 +82,9 @@ do
             echo "Test passed.">>log.txt
         else
             echo "Test failed.">>log.txt
-            echo ${resultsValues[@]}>>log.txt
+            printf -v joined '%s,' "${resultsValues[@]}"
+            echo "${joined%,}">>log.txt
+            echo "Expected 1">>log.txt
         fi
     fi
 
@@ -110,7 +114,9 @@ do
             echo "Test passed.">>log.txt
         else
             echo "Test failed."
-            echo ${resultsValues[@]}>>log.txt
+            printf -v joined '%s,' "${resultsValues[@]}"
+            echo "${joined%,}">>log.txt
+            echo "Expected 1">>log.txt
         fi
     fi
 
@@ -139,7 +145,9 @@ do
             echo "Test passed.">>log.txt
         else
             echo "Test failed.">>log.txt
-            echo ${resultsValues[@]}>>log.txt
+            printf -v joined '%s,' "${resultsValues[@]}"
+            echo "${joined%,}">>log.txt
+            echo "Expected 0,1,1">>log.txt
         fi
     fi
 
@@ -161,13 +169,15 @@ do
                 resultsValues+=(${array[index]})
             fi
         done
-        if [[ ${resultsValues[0]} == 5 && ${resultsValues[1]} == 55 && ${resultsValues[2]} == 610 && ${resultsValues[2]} == 6765 ]]
+        if [[ ${resultsValues[0]} == 5 && ${resultsValues[1]} == 55 && ${resultsValues[2]} == 610 && ${resultsValues[3]} == 6765 ]]
         then
             ((score+=15))
             echo "Test passed.">>log.txt
         else
             echo "Test failed.">>log.txt
-            echo ${resultsValues[@]}>>log.txt
+            printf -v joined '%s,' "${resultsValues[@]}"
+            echo "${joined%,}">>log.txt
+            echo "Expected 5,55,610,6765">>log.txt
         fi
     fi
 
@@ -195,10 +205,12 @@ do
             echo "Test passed.">>log.txt
         else
             echo "Test failed.">>log.txt
-            echo ${resultsValues[@]}>>log.txt
+            printf -v joined '%s,' "${resultsValues[@]}"
+            echo "${joined%,}">>log.txt
+            echo "Expected 9969216677189303386214405760200,16130531424904581415797907386349,26099748102093884802012313146549">>log.txt
         fi
     fi
-    
+
     # Test Case 7
     echo "Test Case 7">>log.txt
     resultsIndex=()
@@ -227,14 +239,14 @@ do
         else
             ((score+=20))
             echo "Test failed.">>log.txt
-            echo ${resultsIndex[@]}>>log.txt
+            echo ${resultsIndex[-1]}>>log.txt
         fi
     fi
 
     ((score*=40))
     ((score/=75))
     echo ${score}
-    echo $entry , $score , ${resultsIndex[@]}, $pass >> ../marks.csv
+    echo $entry , $score , ${resultsIndex[-1]}, $pass >> ../marks.csv
 
     #CLEANUP
     make -f makefile.mak clean
