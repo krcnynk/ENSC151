@@ -15,6 +15,7 @@ do
     cppFile=$(ls -1 | egrep '\.cpp$')
     cppFile=${cppFile::-4}
     cp ../${solPath}makefile.mak ./
+    make -C ${solPath} -f makefile.mak clean
     make -f makefile.mak all
 
 
@@ -235,6 +236,7 @@ do
             ((score+=20))
             # echo ${resultsIndex[-1]}
             echo "Test passed.">>log.txt
+            echo ${resultsIndex[-1]}>>log.txt
             pass="True"
         else
             ((score+=20))
@@ -249,8 +251,7 @@ do
     echo $entry , $score , ${resultsIndex[-1]}, $pass >> ../marks.csv
 
     #CLEANUP
-    make -f makefile.mak clean
-    rm -f makefile.mak
+    # make -f makefile.mak clean
+    # rm -f makefile.mak
     cd ../
-    make -C ${solPath} -f makefile.mak clean
 done
