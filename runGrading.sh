@@ -5,7 +5,7 @@ make -C ${solPath} -f makefile.mak clean
 make -C ${solPath} -f makefile.mak all
 dirList=$(ls -d */ |  cut -f1 -d'/' | grep -v '^solution$')
 rm marks.csv
-echo "GroupName" , "Grades" , "LargestIndex", "Pass">> marks.csv
+echo "GroupName" , "Grades" , "LargestIndex", "Pass", "Compiled">> marks.csv
 
 for entry in $dirList
 do
@@ -16,8 +16,10 @@ do
     cppFile=${cppFile::-4}
     cp ../${solPath}makefile.mak ./
     make -C ${solPath} -f makefile.mak clean
-    make -f makefile.mak all
-
+    makefileWorked="No"
+    if make -f makefile.mak all; then
+        makefileWorked="Yes"
+    fi
 
     echo "Group: ${entry}"
     # Test Case 1
@@ -25,7 +27,7 @@ do
     resultsIndex=()
     resultsValues=()
     score=0
-    (ls LATE.txt && ((score-=10)) )
+    (ls LATE.txt && ((score-=5)) )
     array=($(timeout 5 sh -c "echo 0 -1 | ./$cppFile"))
     # echo ${array[0]}
     if [[ $? = "124" ]]
@@ -233,22 +235,22 @@ do
         done
         if [[ ${resultsIndex[-1]} < 16000 && ${resultsIndex[-1]} > 11000 ]]
         then
-            ((score+=20))
+            ((score+=15))
             # echo ${resultsIndex[-1]}
             echo "Test passed.">>log.txt
             echo ${resultsIndex[-1]}>>log.txt
             pass="True"
         else
-            ((score+=20))
+            # ((score+=20))
             echo "Test failed.">>log.txt
             echo ${resultsIndex[-1]}>>log.txt
         fi
     fi
 
     ((score*=40))
-    ((score/=75))
+    ((score/=70))
     echo ${score}
-    echo $entry , $score , ${resultsIndex[-1]}, $pass >> ../marks.csv
+    echo $entry , $score , ${resultsIndex[-1]}, $pass, $makefileWorked >> ../marks.csv
 
     #CLEANUP
     # make -f makefile.mak clean
