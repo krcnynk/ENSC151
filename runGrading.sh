@@ -10,7 +10,7 @@ rm -f compilationList.csv
 echo "GroupName", "Test1_Grade","Test1_Comments", \
 "Test2_Grade","Test2_Comments","Test3_Grade","Test3_Comments", \
 "Test4_Grade","Test4_Comments","Test5_Grade","Test5_Comments", \
-"Test6_Grade","Test6_Comments","Test7_Grade","Test7_Comments","Test8_Grade","Test8_Comments","Pass", \
+"Test6_Grade","Test6_Comments","Test7_Grade","Test7_Comments","Test8_Grade","Test8_Comments", "MaxIndex","Pass", \
 "TotalGrade","LateScore">>marks.csv
 
 echo "GroupName", "Compiled" >> compilationList.csv
@@ -311,11 +311,11 @@ do
     log8=""
     log8="$log8 Input -1;"
     runs=3
-    for (( i=0; i <= $runs; ++i ))
+    for (( i=0; i < $runs; ++i ))
     do
         array=($(timeout 5 sh -c "echo -1 | ./$programName"))
         retVal=$?
-        repeatedArray+=${array[-1]}
+        repeatedArray+=(${array[-1]})
     done
     max=${repeatedArray[0]}
     for n in "${repeatedArray[@]}" ; do
@@ -351,7 +351,7 @@ do
 
     echo $entry , $score1 ,$log1,$score2 ,$log2, \
     $score3 ,$log3,$score4,$log4 ,$score5 ,$log5,$score6 ,$log6,$score7,\
-    $log7,$score8 ,$log8, $pass,\
+    $log7,$score8 ,$log8, $max, $pass,\
     $scoreTotal, $LateScore >> ../marks.csv
 
     #CLEANUP
