@@ -27,36 +27,42 @@
 #include <chrono>
 #include <iomanip>
 #include <string>
+#include <iostream>
+#include <fstream>
 #include "bignumber.h"
 // *** add more include files if you would like ***
 using namespace std;
 using namespace std::chrono;
 
-int main() {
+int main()
+{
 
-	cout << "Do not change this line.  Enter a sequence of increasing Fibonacci indicies and -1 to stop input.\n" << endl;
+	cout << "Do not change this line.  Enter a sequence of increasing Fibonacci indicies and -1 to stop input.\n"
+		 << endl;
 	std::string str;
-// If you want to see maximum string length(max size of BigNumber), uncomment bottom line
-//	cout << "Maximum number: " << str.max_size() << "\n" << endl;
+	// If you want to see maximum string length(max size of long long), uncomment bottom line
+	//	cout << "Maximum number: " << str.max_size() << "\n" << endl;
 
 	// Section 1
 	// *** insert here a loop to input Fibonacci indexes and calculate Fibonacci numbers, or input -1 to stop input ***
-	BigNumber bNb{1};
-	BigNumber bNa{0};
-	BigNumber bN{0};
-	BigNumber bNc{0};
+	long long bNb{1};
+	long long bNa{0};
+	long long bN{0};
+	long long bNc{0};
+
 	int i{0};
 	int n;
 
-	while (cin >> n,-1 != n) {
-		while(true) {
+	while (cin >> n, -1 != n)
+	{
+		while (true)
+		{
 			if (n == i)
 			{
 				bN = bNa;
 				break;
 			}
-
-			if (n == i+1)
+			if (n == i + 1)
 			{
 				bN = bNb;
 				break;
@@ -69,73 +75,116 @@ int main() {
 		cout << bN << endl;
 	}
 
-	int min = 99999;
-	int max = 0;
-	int iter = 0;
+	// SECTOR
+	std::ofstream myfile;
 	std::cout << std::fixed << std::setprecision(9) << std::left;
-	const double runLimit{2.0}; // generate Fibonacci numbers for 2 more seconds
-	while(iter < 100)
+	time_point<steady_clock> start = steady_clock::now();
+	const double runLimit{20.0};
+	std::chrono::duration<double> diff;
+	int iter = 0;
+	while (iter < 10)
 	{
 		// Section 2
 		i = 1;
 		bNa = 0;
 		bNb = 1;
-	// use the next line as is to capture the start time of a 2 second period
-	time_point<steady_clock> start = steady_clock::now();
-		while((steady_clock::now() - start)/1s < runLimit)
-		{ // true if 2 seconds since start time have not yet elapsed
-
-	// *** put code here to generate more Fibonacci numbers. ***
+		start = steady_clock::now();
+		while ((steady_clock::now() - start) / 1000us < runLimit)
+		{
 			bNa += bNb;
 			bNb += bNa;
 			i += 2;
 		}
-
-		if(max < i)
-		{
-			max = i;
-		}
-		if(min > i)
-		{
-			min = i;
-		}
 		++iter;
 	}
-	cout << max << endl;
-	cout << min << endl;
-// 	// *** output the highest Fibonacci index calculated ***
-// 	std::chrono::duration<double> diff = (steady_clock::now() - start);
-// 	cout << diff.count() << endl; //Prints how long it took
-//	cout << i << endl;
-// //   cout << bNb << endl;
 
-//    // Section 2, Method Alternative
-//    // use the next line as is to capture the start time of a 2 second period
-//    i = 1;
-//    bNa = 0;
-//    bNb = 1;
-//    start = steady_clock::now();
-//    while((steady_clock::now() - start)/1s < runLimit)
-//    { // true if 2 seconds since start time have not yet elapsed
+	myfile.open("200Runs11.csv");
+	iter = 0;
+	while (iter < 200)
+	{
+		// Section 2
+		i = 1;
+		bNa = 0;
+		bNb = 1;
+		start = steady_clock::now();
+		while ((steady_clock::now() - start) / 1000us < runLimit)
+		{
+			bNa += bNb;
+			bNb += bNa;
+			i += 2;
+		}
+		++iter;
+		diff = (steady_clock::now() - start);
+		myfile << i << "," << diff.count() << endl;
+	}
+	myfile.close();
 
-//       // *** put code here to generate more Fibonacci numbers. ***
-//       bNc = bNa+bNb;
-//       bNa = bNb;
-//       bNb = bNc;
-//       i += 1;
-// //    Experimentation
-// //      bNc = bNa+bNb;
-// //      bNa = bNb;
-// //      bNb = bNc;
-// //      i += 2;
+	myfile.open("200Runs22.csv");
+	iter = 0;
+	while (iter < 200)
+	{
+		// Section 2
+		i = 1;
+		bNa = 0;
+		bNb = 1;
+		start = steady_clock::now();
+		while ((steady_clock::now() - start) / 1000us < runLimit)
+		{
+			bNc = bNa + bNb;
+			bNa = bNb;
+			bNb = bNc;
+			i += 1;
+		}
+		++iter;
+		diff = (steady_clock::now() - start);
+		myfile << i << "," << diff.count() << endl;
+	}
+	myfile.close();
 
-//    }
+	// Section 2 Method1
+	// 	i = 1;
+	// 	bNa = 0;
+	// 	bNb = 1;
+	// 	// use the next line as is to capture the start time of a 2 second period
+	// 	time_point<steady_clock> start = steady_clock::now();
+	// 	while((steady_clock::now() - start)/1s < runLimit)
+	// 	{ // true if 2 seconds since start time have not yet elapsed
 
-//    // *** output the highest Fibonacci index calculated ***
-//    diff = (steady_clock::now() - start);
-//    cout << diff.count() << endl; //Prints how long it took
-//    cout << i << endl;
+	// 		bNa += bNb;
+	// 		bNb += bNa;
+	// 		i += 2;
+	// 	}
+
+	// 	// *** output the highest Fibonacci index calculated ***
+	// 	std::chrono::duration<double> diff = (steady_clock::now() - start);
+	// 	cout << diff.count() << endl; //Prints how long long it took
+	// 	cout << i << endl;
+	// //   cout << bNb << endl;
+
+	// 	// Section 2, Method Alternative
+	// 	// use the next line as is to capture the start time of a 2 second period
+	// 	i = 1;
+	// 	bNa = 0;
+	// 	bNb = 1;
+	// 	start = steady_clock::now();
+	// 	while((steady_clock::now() - start)/1s < runLimit)
+	// 	{ // true if 2 seconds since start time have not yet elapsed
+	// 	bNc = bNa+bNb;
+	// 	bNa = bNb;
+	// 	bNb = bNc;
+	// 	i += 1;
+	// 	//    Experimentation
+	// 	//      bNc = bNa+bNb;
+	// 	//      bNa = bNb;
+	// 	//      bNb = bNc;
+	// 	//      i += 2;
+
+	// 	}
+
+	// // 	// *** output the highest Fibonacci index calculated ***
+	// 	diff = (steady_clock::now() - start);
+	// 	cout << diff.count() << endl; //Prints how long long it took
+	// 	cout << i << endl;
 
 	return 0;
 }
-

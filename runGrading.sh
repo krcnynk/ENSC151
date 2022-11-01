@@ -4,71 +4,97 @@ solPath="solution/"
 make -C ${solPath} -f makefile.mak clean
 make -C ${solPath} -f makefile.mak all
 dirList=$(ls -d */ |  cut -f1 -d'/' | grep -v '^solution$')
-rm marks.csv
-echo "GroupName" , "Grades" , "LargestIndex", "Pass", "Compiled">> marks.csv
+rm -f marks.csv
+rm -f compilationList.csv
 
+echo "GroupName", "Test1_Grade","Test1_Comments", \
+"Test2_Grade","Test2_Comments","Test3_Grade","Test3_Comments", \
+"Test4_Grade","Test4_Comments","Test5_Grade","Test5_Comments", \
+"Test6_Grade","Test6_Comments","Test7_Grade","Test7_Comments","Test8_Grade","Test8_Comments","Pass", \
+"TotalGrade","LateScore">>marks.csv
+
+echo "GroupName", "Compiled" >> compilationList.csv
+
+set -f              # turn off globbing
+IFS='
+'  
 for entry in $dirList
 do
-    # SETUP
+# SETUP
     cd ${entry}
-    rm log.txt
-    cppFile=$(ls -1 | egrep '\.cpp$')
-    cppFile=${cppFile::-4}
     cp ../${solPath}makefile.mak ./
-    make -C ${solPath} -f makefile.mak clean
+    make -f makefile.mak clean
     makefileWorked="No"
     if make -f makefile.mak all; then
         makefileWorked="Yes"
     fi
+    echo $entry ,$makefileWorked >> ../compilationList.csv
+    cd ../
+done
 
-    echo "Group: ${entry}"
+for entry in $dirList
+do
+    cd ${entry}
+    cppName=$(ls -1 | egrep '\.cpp$')
+    programName=${cppName::-4}
+
+    LateScore="0"
+    if ls LATE.txt 2>/dev/null; then
+        LateScore="5"
+    fi
+
     # Test Case 1
-    echo "Test Case 1">>log.txt
     resultsIndex=()
     resultsValues=()
-    score=0
-    (ls LATE.txt && ((score-=5)) )
-    array=($(timeout 5 sh -c "echo 0 -1 | ./$cppFile"))
-    # echo ${array[0]}
-    if [[ $? = "124" ]]
+    score1="0"
+    log1=""
+    log1="$log1 Input 0;"
+    array=($(timeout 5 sh -c "echo 0 -1 | ./$programName"))
+    retVal=$?
+    array=("${array[@]:1}") #Remove first element "Do not remove ..."
+    if [[ $retVal -eq 124 ]]
     then
-        echo "Test failed. because of infinite loop.">>log.txt
+        log1="$log1 Test failed because of infinite loop.;"
+    elif [[ $retVal -ne 0 ]]
+    then
+        log1="$log1 Test failed fatal error. RetVal = $retVal;"
     else
-        #THIS IS FOR INDEXES
         for index in ${!array[@]}; do
             if [[ $((index % 2)) == 0 ]]
             then
                 resultsIndex+=(${array[index]})
-                # echo (${array[index]})
             else
                 resultsValues+=(${array[index]})
-                # echo (${array[index]})
             fi
-        # (( (index) % 2 )) && echo "(${array[index]})"
         done
 
         if [[ ${resultsValues[0]} == 0 ]]
         then
-            ((score+=5))
-            echo "Test passed.">>log.txt
+            score1="5"
+            log1="$log1 Test passed;"
         else
-            echo "Test failed.">>log.txt
-            printf -v joined '%s,' "${resultsValues[@]}"
-            echo "${joined%,}">>log.txt
-            echo "Expected 0">>log.txt
+            log1="$log1 Test failed;"
         fi
-        # echo ${resultsValues[@]}
+        printf -v joined '%s ' "${resultsValues[@]}"
+        log1="$log1 Results: ${joined};"
+        log1="$log1 Expected: 0;"
     fi
 
     # Test Case 2
-    echo "Test Case 2">>log.txt
     resultsIndex=()
     resultsValues=()
-    array=($(timeout 5 sh -c "echo 1 -1 | ./$cppFile"))
-    # echo ${array[@]}
-    if [[ $? = "124" ]]
+    score2="0"
+    log2=""
+    log2="$log2 Input 1;"
+    array=($(timeout 5 sh -c "echo 1 -1 | ./$programName"))
+    retVal=$?
+    array=("${array[@]:1}") #Remove first element "Do not remove ..."
+    if [[ $retVal -eq 124 ]]
     then
-        echo "Test failed. because of infinite loop.">>log.txt
+        log2="$log2 Test failed because of infinite loop.;"
+    elif [[ $retVal -ne 0 ]]
+    then
+        log2="$log2 Test failed fatal error. RetVal = $retVal;"
     else
         for index in ${!array[@]}; do
             if [[ $((index % 2)) == 0 ]]
@@ -81,26 +107,32 @@ do
 
         if [[ ${resultsValues[0]} == 1 ]]
         then
-            ((score+=5))
-            echo "Test passed.">>log.txt
+            score2="5"
+            log2="$log2 Test passed;"
         else
-            echo "Test failed.">>log.txt
-            printf -v joined '%s,' "${resultsValues[@]}"
-            echo "${joined%,}">>log.txt
-            echo "Expected 1">>log.txt
+            log2="$log2 Test failed;"
         fi
+        printf -v joined '%s ' "${resultsValues[@]}"
+        log2="$log2 Results: ${joined};"
+        log2="$log2 Expected: 1;"
     fi
 
 
     # Test Case 3
-    echo "Test Case 3">>log.txt
     resultsIndex=()
     resultsValues=()
-    array=($(timeout 5 sh -c "echo 2 -1 | ./$cppFile"))
-    # echo ${array[@]}
-    if [[ $? = "124" ]]
+    score3="0"
+    log3=""
+    log3="$log3 Input 2;"
+    array=($(timeout 5 sh -c "echo 2 -1 | ./$programName"))
+    retVal=$?
+    array=("${array[@]:1}") #Remove first element "Do not remove ..."
+    if [[ $retVal -eq 124 ]]
     then
-        echo "Test failed. because of infinite loop.">>log.txt
+        log3="$log3 Test failed because of infinite loop.;"
+    elif [[ $retVal -ne 0 ]]
+    then
+        log3="$log3 Test failed fatal error. RetVal = $retVal;"
     else
         for index in ${!array[@]}; do
             if [[ $((index % 2)) == 0 ]]
@@ -113,26 +145,32 @@ do
 
         if [[ ${resultsValues[0]} == 1 ]]
         then
-            ((score+=5))
-            echo "Test passed.">>log.txt
+            score3="5"
+            log3="$log3 Test passed;"
         else
-            echo "Test failed."
-            printf -v joined '%s,' "${resultsValues[@]}"
-            echo "${joined%,}">>log.txt
-            echo "Expected 1">>log.txt
+            log3="$log3 Test failed;"
         fi
+        printf -v joined '%s ' "${resultsValues[@]}"
+        log3="$log3 Results: ${joined};"
+        log3="$log3 Expected: 1;"
     fi
 
 
     # Test Case 4
-    echo "Test Case 4">>log.txt
     resultsIndex=()
     resultsValues=()
-    array=($(timeout 5 sh -c "echo 0 1 2 -1 | ./$cppFile"))
-    # echo ${array[@]}
-    if [[ $? = "124" ]]
+    score4="0"
+    log4=""
+    log4="$log4 Input 0 1 2 -1;"
+    array=($(timeout 5 sh -c "echo 0 1 2 -1 | ./$programName"))
+    retVal=$?
+    array=("${array[@]:1}") #Remove first element "Do not remove ..."
+    if [[ $retVal -eq 124 ]]
     then
-        echo "Test failed. because of infinite loop.">>log.txt
+        log4="$log4 Test failed because of infinite loop.;"
+    elif [[ $retVal -ne 0 ]]
+    then
+        log4="$log4 Test failed fatal error. RetVal = $retVal;"
     else
         for index in ${!array[@]}; do
             if [[ $((index % 2)) == 0 ]]
@@ -144,25 +182,31 @@ do
         done
         if [[ ${resultsValues[0]} == 0 && ${resultsValues[1]} == 1 && ${resultsValues[2]} == 1 ]]
         then
-            ((score+=10))
-            echo "Test passed.">>log.txt
+            score4="5"
+            log4="$log4 Test passed;"
         else
-            echo "Test failed.">>log.txt
-            printf -v joined '%s,' "${resultsValues[@]}"
-            echo "${joined%,}">>log.txt
-            echo "Expected 0,1,1">>log.txt
+            log4="$log4 Test failed;"
         fi
+        printf -v joined '%s ' "${resultsValues[@]}"
+        log4="$log4 Results: ${joined};"
+        log4="$log4 Expected: 0 1 1;"
     fi
 
     # Test Case 5
-    echo "Test Case 5">>log.txt
     resultsIndex=()
     resultsValues=()
-    array=($(timeout 5 sh -c "echo 5 10 15 20 -1 | ./$cppFile"))
-    # echo ${array[@]}
-    if [[ $? = "124" ]]
+    score5="0"
+    log5=""
+    log5="$log5 Input 5 10 15 20;"
+    array=($(timeout 5 sh -c "echo 5 10 15 20 -1 | ./$programName"))
+    retVal=$?
+    array=("${array[@]:1}") #Remove first element "Do not remove ..."
+    if [[ $retVal -eq 124 ]]
     then
-        echo "Test failed. because of infinite loop.">>log.txt
+        log5="$log5 Test failed because of infinite loop.;"
+    elif [[ $retVal -ne 0 ]]
+    then
+        log5="$log5 Test failed fatal error. RetVal = $retVal;"
     else
         for index in ${!array[@]}; do
             if [[ $((index % 2)) == 0 ]]
@@ -174,25 +218,70 @@ do
         done
         if [[ ${resultsValues[0]} == 5 && ${resultsValues[1]} == 55 && ${resultsValues[2]} == 610 && ${resultsValues[3]} == 6765 ]]
         then
-            ((score+=15))
-            echo "Test passed.">>log.txt
+            score5="15"
+            log5="$log5 Test passed;"
         else
-            echo "Test failed.">>log.txt
-            printf -v joined '%s,' "${resultsValues[@]}"
-            echo "${joined%,}">>log.txt
-            echo "Expected 5,55,610,6765">>log.txt
+            log5="$log5 Test failed;"
         fi
+        printf -v joined '%s ' "${resultsValues[@]}"
+        log5="$log5 Results: ${joined};"
+        log5="$log5 Expected: 5 55 610 6765;"
     fi
 
+
+
     # Test Case 6
-    echo "Test Case 6">>log.txt
     resultsIndex=()
     resultsValues=()
-    array=($(timeout 5 sh -c "echo 150 151 152 -1 | ./$cppFile"))
-    # echo ${array[@]}
-    if [[ $? = "124" ]]
+    score6="0"
+    log6=""
+    log6="$log6 Input 90 110;"
+    array=($(timeout 5 sh -c "echo 90 110 -1 | ./$programName"))
+    retVal=$?
+    array=("${array[@]:1}") #Remove first element "Do not remove ..."
+    if [[ $retVal -eq 124 ]]
     then
-        echo "Test failed. because of infinite loop.">>log.txt
+        log6="$log6 Test failed because of infinite loop.;"
+    elif [[ $retVal -ne 0 ]]
+    then
+        log6="$log6 Test failed fatal error. RetVal = $retVal;"
+    else
+        for index in ${!array[@]}; do
+            if [[ $((index % 2)) == 0 ]]
+            then
+                resultsIndex+=(${array[index]})
+            else
+                resultsValues+=(${array[index]})
+            fi
+        done
+        if [[ ${resultsValues[0]} == 2880067194370816120 && ${resultsValues[1]} == 43566776258854844738105 ]]
+        then
+            score6="15"
+            log6="$log6 Test passed;"
+        else
+            log6="$log6 Test failed;"
+        fi
+        printf -v joined '%s ' "${resultsValues[@]}"
+        log6="$log6 Results: ${joined};"
+        log6="$log6 Expected: 2880067194370816120 43566776258854844738105;"
+    fi
+
+
+    # Test Case 7
+    resultsIndex=()
+    resultsValues=()
+    score7="0"
+    log7=""
+    log7="$log7 Input 150 151 152;"
+    array=($(timeout 5 sh -c "echo 150 151 152 -1 | ./$programName"))
+    retVal=$?
+    array=("${array[@]:1}") #Remove first element "Do not remove ..."
+    if [[ $retVal -eq 124 ]]
+    then
+        log7="$log7 Test failed because of infinite loop.;"
+    elif [[ $retVal -ne 0 ]]
+    then
+        log7="$log7 Test failed fatal error. RetVal = $retVal;"
     else
         for index in ${!array[@]}; do
             if [[ $((index % 2)) == 0 ]]
@@ -204,53 +293,66 @@ do
         done
         if [[ ${resultsValues[0]} == 9969216677189303386214405760200 && ${resultsValues[1]} == 16130531424904581415797907386349 && ${resultsValues[2]} == 26099748102093884802012313146549 ]]
         then
-            ((score+=15))
-            echo "Test passed.">>log.txt
+            score7="15"
+            log7="$log7 Test passed;"
         else
-            echo "Test failed.">>log.txt
-            printf -v joined '%s,' "${resultsValues[@]}"
-            echo "${joined%,}">>log.txt
-            echo "Expected 9969216677189303386214405760200,16130531424904581415797907386349,26099748102093884802012313146549">>log.txt
+            log7="$log7 Test failed;"
         fi
+        printf -v joined '%s ' "${resultsValues[@]}"
+        log7="$log7 Results: ${joined};"
+        log7="$log7 Expected: 9969216677189303386214405760200 16130531424904581415797907386349 26099748102093884802012313146549;"
     fi
 
-    # Test Case 7
-    echo "Test Case 7">>log.txt
+    # Test Case 8
     resultsIndex=()
     resultsValues=()
     pass="False"
-    array=($(timeout 5 sh -c "echo -1 | ./$cppFile"))
-    # echo ${array[@]}
-    if [[ $? = "124" ]]
+    score8="0"
+    log8=""
+    log8="$log8 Input -1;"
+    runs=3
+    for (( i=0; i <= $runs; ++i ))
+    do
+        array=($(timeout 5 sh -c "echo -1 | ./$programName"))
+        retVal=$?
+        repeatedArray+=${array[-1]}
+    done
+    max=${repeatedArray[0]}
+    for n in "${repeatedArray[@]}" ; do
+        ((n > max)) && max=$n
+    done
+    if [[ $retVal -eq 124 ]]
     then
-        echo "Test failed. because of infinite loop.">>log.txt
+        log8="$log8 Test failed because of infinite loop.;"
+    elif [[ $retVal -ne 0 ]]
+    then
+        log8="$log Test failed fatal error. RetVal = $retVal;"
     else
-        for index in ${!array[@]}; do
-            if [[ $((index % 2)) == 0 ]]
-            then
-                resultsIndex+=(${array[index]})
-            else
-                resultsValues+=(${array[index]})
-            fi
-        done
-        if [[ ${resultsIndex[-1]} < 16000 && ${resultsIndex[-1]} > 11000 ]]
+        if [[ $max < 16000 && $max > 11000 ]]
         then
-            ((score+=15))
-            # echo ${resultsIndex[-1]}
-            echo "Test passed.">>log.txt
-            echo ${resultsIndex[-1]}>>log.txt
+            score8="15"
+            log8="$log8 Test passed with $max;"
             pass="True"
         else
-            # ((score+=20))
-            echo "Test failed.">>log.txt
-            echo ${resultsIndex[-1]}>>log.txt
+            score8="15"
+            log8="$log8 Test passed but slow timing with $max;"
         fi
     fi
 
-    ((score*=40))
-    ((score/=70))
-    echo ${score}
-    echo $entry , $score , ${resultsIndex[-1]}, $pass, $makefileWorked >> ../marks.csv
+    # echo "GroupName" , "Test1 Grade","Test1 Comments" \ 
+    # "Test2 Grade","Test2 Comments","Test3 Grade","Test3 Comments" \ 
+    # "Test4 Grade","Test4 Comments","Test5 Grade","Test5 Comments" \ 
+    # "Test6 Grade","Test6 Comments","Test7 Grade","Test7 Comments" \ 
+    # "Test8 Grade","Test8 Comments","TotalGrade", "LargestIndex", "Pass", "LateScore" \ >> marks.csv
+
+    scoreTotal=$((${score1}+${score2}+${score3}+${score4}+${score5}+${score6}+${score7}+${score8}))
+    #5,5,5,5,15,15,15,15
+    # scoreTotal=0
+
+    echo $entry , $score1 ,$log1,$score2 ,$log2, \
+    $score3 ,$log3,$score4,$log4 ,$score5 ,$log5,$score6 ,$log6,$score7,\
+    $log7,$score8 ,$log8, $pass,\
+    $scoreTotal, $LateScore >> ../marks.csv
 
     #CLEANUP
     # make -f makefile.mak clean
