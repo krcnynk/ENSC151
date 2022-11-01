@@ -311,6 +311,7 @@ do
     log8=""
     log8="$log8 Input -1;"
     runs=3
+    max="0"
     for (( i=0; i < $runs; ++i ))
     do
         array=($(timeout 5 sh -c "echo -1 | ./$programName"))
@@ -338,12 +339,6 @@ do
             log8="$log8 Test passed but slow timing with $max;"
         fi
     fi
-
-    # echo "GroupName" , "Test1 Grade","Test1 Comments" \ 
-    # "Test2 Grade","Test2 Comments","Test3 Grade","Test3 Comments" \ 
-    # "Test4 Grade","Test4 Comments","Test5 Grade","Test5 Comments" \ 
-    # "Test6 Grade","Test6 Comments","Test7 Grade","Test7 Comments" \ 
-    # "Test8 Grade","Test8 Comments","TotalGrade", "LargestIndex", "Pass", "LateScore" \ >> marks.csv
 
     scoreTotal=$((${score1}+${score2}+${score3}+${score4}+${score5}+${score6}+${score7}+${score8}))
     #5,5,5,5,15,15,15,15
