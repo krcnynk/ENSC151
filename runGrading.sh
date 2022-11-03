@@ -312,6 +312,7 @@ do
     log8="$log8 Input -1;"
     runs=3
     max="0"
+    repeatedArray=()
     for (( i=0; i < $runs; ++i ))
     do
         array=($(timeout 5 sh -c "echo -1 | ./$programName"))
@@ -329,14 +330,12 @@ do
     then
         log8="$log Test failed fatal error. RetVal = $retVal;"
     else
-        if [[ $max < 16000 && $max > 11000 ]]
+        if [[ $max < 19064 && $max > 18808 ]]
         then
-            score8="15"
-            log8="$log8 Test passed with $max;"
+            log8="$log8 Test passed $max;"
             pass="True"
         else
-            score8="15"
-            log8="$log8 Test passed but slow timing with $max;"
+            log8="$log8 Test passed but slow timing $max;"
         fi
     fi
 
