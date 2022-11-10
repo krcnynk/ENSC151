@@ -10,7 +10,7 @@ rm -f compilationList.csv
 echo "GroupName", "Test1_Grade","Test1_Comments", \
 "Test2_Grade","Test2_Comments","Test3_Grade","Test3_Comments", \
 "Test4_Grade","Test4_Comments","Test5_Grade","Test5_Comments", \
-"Test6_Grade","Test6_Comments","Test7_Grade","Test7_Comments","Test8_Grade","Test8_Comments", "MaxIndex","Pass", \
+"Test6_Grade","Test6_Comments","Test7_Grade","Test7_Comments","Test8_Grade","Test8_Comments", "MaxIndex", \
 "TotalGrade","LateScore">>marks.csv
 
 echo "GroupName", "Compiled" >> compilationList.csv
@@ -52,7 +52,7 @@ do
     array=($(timeout 5 sh -c "echo 0 -1 | ./$programName"))
     retVal=$?
     array=("${array[@]:1}") #Remove first element "Do not remove ..."
-    if [[ $retVal -eq 124 ]]
+    if [[ $retVal == 124 ]]
     then
         log1="$log1 Test failed because of infinite loop.;"
     elif [[ $retVal -ne 0 ]]
@@ -89,7 +89,7 @@ do
     array=($(timeout 5 sh -c "echo 1 -1 | ./$programName"))
     retVal=$?
     array=("${array[@]:1}") #Remove first element "Do not remove ..."
-    if [[ $retVal -eq 124 ]]
+    if [[ $retVal == 124 ]]
     then
         log2="$log2 Test failed because of infinite loop.;"
     elif [[ $retVal -ne 0 ]]
@@ -127,7 +127,7 @@ do
     array=($(timeout 5 sh -c "echo 2 -1 | ./$programName"))
     retVal=$?
     array=("${array[@]:1}") #Remove first element "Do not remove ..."
-    if [[ $retVal -eq 124 ]]
+    if [[ $retVal == 124 ]]
     then
         log3="$log3 Test failed because of infinite loop.;"
     elif [[ $retVal -ne 0 ]]
@@ -165,7 +165,7 @@ do
     array=($(timeout 5 sh -c "echo 0 1 2 -1 | ./$programName"))
     retVal=$?
     array=("${array[@]:1}") #Remove first element "Do not remove ..."
-    if [[ $retVal -eq 124 ]]
+    if [[ $retVal == 124 ]]
     then
         log4="$log4 Test failed because of infinite loop.;"
     elif [[ $retVal -ne 0 ]]
@@ -201,7 +201,7 @@ do
     array=($(timeout 5 sh -c "echo 5 10 15 20 -1 | ./$programName"))
     retVal=$?
     array=("${array[@]:1}") #Remove first element "Do not remove ..."
-    if [[ $retVal -eq 124 ]]
+    if [[ $retVal == 124 ]]
     then
         log5="$log5 Test failed because of infinite loop.;"
     elif [[ $retVal -ne 0 ]]
@@ -239,7 +239,7 @@ do
     array=($(timeout 5 sh -c "echo 90 110 -1 | ./$programName"))
     retVal=$?
     array=("${array[@]:1}") #Remove first element "Do not remove ..."
-    if [[ $retVal -eq 124 ]]
+    if [[ $retVal == 124 ]]
     then
         log6="$log6 Test failed because of infinite loop.;"
     elif [[ $retVal -ne 0 ]]
@@ -276,7 +276,7 @@ do
     array=($(timeout 5 sh -c "echo 150 151 152 -1 | ./$programName"))
     retVal=$?
     array=("${array[@]:1}") #Remove first element "Do not remove ..."
-    if [[ $retVal -eq 124 ]]
+    if [[ $retVal == 124 ]]
     then
         log7="$log7 Test failed because of infinite loop.;"
     elif [[ $retVal -ne 0 ]]
@@ -323,7 +323,7 @@ do
     for n in "${repeatedArray[@]}" ; do
         ((n > max)) && max=$n
     done
-    if [[ $retVal -eq 124 ]]
+    if [[ $retVal == 124 ]]
     then
         log8="$log8 Test failed because of infinite loop.;"
     elif [[ $retVal -ne 0 ]]
@@ -345,7 +345,7 @@ do
 
     echo $entry , $score1 ,$log1,$score2 ,$log2, \
     $score3 ,$log3,$score4,$log4 ,$score5 ,$log5,$score6 ,$log6,$score7,\
-    $log7,$score8 ,$log8, $max, $pass,\
+    $log7,$score8 ,$log8, $max,\
     $scoreTotal, $LateScore >> ../marks.csv
 
     #CLEANUP
